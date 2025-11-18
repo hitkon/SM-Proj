@@ -2,8 +2,11 @@ package com.example.dm_helper
 
 import android.content.Intent
 import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Button
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dm_helper.data.Portrait
 import com.example.dm_helper.data.PortraitDatabase
@@ -46,6 +49,12 @@ class MainActivity : AppCompatActivity() {
     private fun savePortraitToDatabase(uri: String) {
         CoroutineScope(Dispatchers.IO).launch {
             db.portraitDao().insert(Portrait(imageUri = uri))
+        }
+
+        val startSessionButton: Button = findViewById(R.id.start_session_button)
+        startSessionButton.setOnClickListener {
+            val intent = Intent(this, SessionActivity::class.java)
+            startActivity(intent)
         }
     }
 }
