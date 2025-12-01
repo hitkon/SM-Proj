@@ -2,7 +2,6 @@ package com.example.dm_helper
 
 import android.content.Intent
 import android.net.Uri
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import android.widget.Button
@@ -33,7 +32,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnNewGame.setOnClickListener {  }
+        binding.btnNewGame.setOnClickListener {
+            val intent = Intent(this, SessionActivity::class.java)
+            startActivity(intent)
+        }
 
         binding.btnLoadGame.setOnClickListener {  }
 
@@ -49,12 +51,6 @@ class MainActivity : AppCompatActivity() {
     private fun savePortraitToDatabase(uri: String) {
         CoroutineScope(Dispatchers.IO).launch {
             db.portraitDao().insert(Portrait(imageUri = uri))
-        }
-
-        val startSessionButton: Button = findViewById(R.id.start_session_button)
-        startSessionButton.setOnClickListener {
-            val intent = Intent(this, SessionActivity::class.java)
-            startActivity(intent)
         }
     }
 }

@@ -55,6 +55,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+
     val room_version = "2.8.3"
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
@@ -64,4 +66,5 @@ dependencies {
     implementation("androidx.room:room-guava:${room_version}")
     implementation("androidx.room:room-paging:$room_version")
     testImplementation("androidx.room:room-testing:$room_version")
+    implementation("com.google.code.gson:gson:2.10.1")
 }

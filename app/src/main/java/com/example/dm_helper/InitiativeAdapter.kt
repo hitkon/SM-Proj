@@ -1,10 +1,12 @@
 package com.example.dm_helper
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -24,6 +26,7 @@ class InitiativeAdapter(
         val conditionIconsLayout: LinearLayout = itemView.findViewById(R.id.condition_icons_layout)
         val hpValue: TextView = itemView.findViewById(R.id.hp_value)
         val dragHandle: ImageView = itemView.findViewById(R.id.drag_handle)
+        val characterSheetButton: ImageButton = itemView.findViewById(R.id.character_sheet_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InitiativeViewHolder {
@@ -55,6 +58,14 @@ class InitiativeAdapter(
             }
             true
         }
+
+        holder.characterSheetButton.setOnClickListener {
+            val context = holder.itemView.context
+            val intent = Intent(context, CharacterSheetActivity::class.java).apply {
+                putExtra(CharacterSheetActivity.CHARACTER_ID, currentCharacter.id)
+            }
+            context.startActivity(intent)
+        }
     }
 
     override fun getItemCount() = characters.size
@@ -62,5 +73,12 @@ class InitiativeAdapter(
     fun moveItem(from: Int, to: Int) {
         Collections.swap(characters, from, to)
         notifyItemMoved(from, to)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateCharacters(newCharacters: List<Character>) {
+        characters.clear()
+        characters.addAll(newCharacters)
+        notifyDataSetChanged()
     }
 }

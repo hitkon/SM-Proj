@@ -2,25 +2,26 @@ package com.example.dm_helper
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
 
 class SessionActivity : AppCompatActivity() {
+    private lateinit var characterDao: CharacterDao
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.session_layout)
 
-        val characters = mutableListOf(
-            Character("Aragorn", 20, R.drawable.ic_launcher_background, listOf(R.drawable.ic_launcher_background), 100, 100),
-            Character("Legolas", 22, R.drawable.ic_launcher_background, listOf(), 80, 80),
-            Character("Gimli", 18, R.drawable.ic_launcher_background, listOf(R.drawable.ic_launcher_background, R.drawable.ic_launcher_background), 120, 120)
-        ).sortedByDescending { it.initiative }.toMutableList()
+        characterDao = AppDatabase.getDatabase(this).characterDao()
 
         val initiativeRecyclerView: RecyclerView = findViewById(R.id.initiative_recycler_view)
         initiativeRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        val callback = object : ItemTouchHelper.SimpleCallback(
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
             override fun onMove(
@@ -36,11 +37,23 @@ class SessionActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-        }
+        })
 
-        val itemTouchHelper = ItemTouchHelper(callback)
-        val adapter = InitiativeAdapter(characters, itemTouchHelper)
+        val adapter = InitiativeAdapter(mutableListOf(), itemTouchHelper)
         initiativeRecyclerView.adapter = adapter
         itemTouchHelper.attachToRecyclerView(initiativeRecyclerView)
+
+        lifecycleScope.launch {
+            characterDao.getAllCharacters().collect {
+                adapter.updateCharacters(it)
+            }
+        }
+
+        val fab: FloatingActionButton = findViewById(R.id.add_character_fab)
+        fab.setOnClickListener {
+            lifecycleScope.launch {
+                characterDao.insert(createTestCharacter())
+            }
+        }
     }
 }
