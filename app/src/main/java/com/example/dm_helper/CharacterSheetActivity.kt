@@ -1,6 +1,8 @@
 package com.example.dm_helper
 
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -82,6 +84,14 @@ class CharacterSheetActivity : AppCompatActivity() {
         // Handle conditions display...
         val conditionsFlexbox = findViewById<FlexboxLayout>(R.id.conditions_flexbox)
         conditionsFlexbox.removeAllViews()
-        // Here you would check each boolean condition and add a view for it.
+        val conditionIcons = ConditionHelper.getConditionIcons(character)
+        for (condition in conditionIcons) {
+            val imageView = ImageView(this)
+            imageView.setImageResource(condition)
+            val layoutParams = LinearLayout.LayoutParams(96, 96)
+            layoutParams.marginEnd = 16
+            imageView.layoutParams = layoutParams
+            conditionsFlexbox.addView(imageView)
+        }
     }
 }

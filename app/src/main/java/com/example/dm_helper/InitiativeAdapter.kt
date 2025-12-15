@@ -43,7 +43,8 @@ class InitiativeAdapter(
         holder.hpValue.text = "${currentCharacter.currentHP}/${currentCharacter.maximumHP}"
 
         holder.conditionIconsLayout.removeAllViews()
-        for (condition in currentCharacter.conditions) {
+        val conditionIcons = ConditionHelper.getConditionIcons(currentCharacter)
+        for (condition in conditionIcons) {
             val imageView = ImageView(holder.itemView.context)
             imageView.setImageResource(condition)
             val layoutParams = LinearLayout.LayoutParams(48, 48)
