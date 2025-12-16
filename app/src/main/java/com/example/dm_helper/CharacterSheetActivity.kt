@@ -1,6 +1,8 @@
 package com.example.dm_helper
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -84,14 +86,47 @@ class CharacterSheetActivity : AppCompatActivity() {
         // Handle conditions display...
         val conditionsFlexbox = findViewById<FlexboxLayout>(R.id.conditions_flexbox)
         conditionsFlexbox.removeAllViews()
-        val conditionIcons = ConditionHelper.getConditionIcons(character)
-        for (condition in conditionIcons) {
-            val imageView = ImageView(this)
-            imageView.setImageResource(condition)
-            val layoutParams = LinearLayout.LayoutParams(96, 96)
-            layoutParams.marginEnd = 16
-            imageView.layoutParams = layoutParams
-            conditionsFlexbox.addView(imageView)
+        val conditions = ConditionHelper.getConditions(character)
+        for (condition in conditions) {
+            conditionsFlexbox.addView(createConditionView(condition))
         }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun createConditionView(condition: ConditionUi): FrameLayout {
+        val size = 96
+
+        val container = FrameLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                marginEnd = 16
+            }
+        }
+
+        val icon = ImageView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            setImageResource(condition.iconRes)
+        }
+
+        container.addView(icon)
+
+        if (condition.value > 0) {
+            val badge = TextView(this).apply {
+                layoutParams = FrameLayout.LayoutParams(36, 36).apply {
+                    gravity = android.view.Gravity.BOTTOM or android.view.Gravity.END
+                }
+                background = getDrawable(R.drawable.condition_badge)
+                text = condition.value.toString()
+                setTextColor(android.graphics.Color.WHITE)
+                textSize = 12f
+                gravity = android.view.Gravity.CENTER
+                setTypeface(null, android.graphics.Typeface.BOLD)
+            }
+            container.addView(badge)
+        }
+
+        return container
     }
 }

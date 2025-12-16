@@ -1,43 +1,62 @@
 package com.example.dm_helper
 
+import android.util.Log
+
 object ConditionHelper {
 
-    fun getConditionIcons(character: Character): List<Int> {
-        val icons = mutableListOf<Int>()
+    fun getConditions(character: Character): List<ConditionUi> {
+        val conditions = mutableListOf<ConditionUi>()
 
-        if (character.blinded) icons.add(R.drawable.blinded)
-        if (character.clumsy > 0) icons.add(R.drawable.clumsy)
-        if (character.concealed) icons.add(R.drawable.concealed)
-        if (character.confused) icons.add(R.drawable.confused)
-        if (character.controlled) icons.add(R.drawable.controlled)
-        if (character.dazzled) icons.add(R.drawable.dazzled)
-        if (character.deafened) icons.add(R.drawable.deafened)
-        if (character.doomed > 0) icons.add(R.drawable.doomed)
-        if (character.drained > 0) icons.add(R.drawable.drained)
-        if (character.dying > 0) icons.add(R.drawable.dying)
-        if (character.encumbered) icons.add(R.drawable.encumbered)
-        if (character.enfeebled > 0) icons.add(R.drawable.enfeebled)
-        if (character.fascinated) icons.add(R.drawable.fascinated)
-        if (character.fatigued) icons.add(R.drawable.fatigued)
-        if (character.flatFooted) icons.add(R.drawable.flat_footed)
-        if (character.fleeing) icons.add(R.drawable.fleeing)
-        if (character.frightened > 0) icons.add(R.drawable.frightened)
-        if (character.grabbed) icons.add(R.drawable.grabbed)
-        if (character.immobilized) icons.add(R.drawable.immobilized)
-        if (character.invisible) icons.add(R.drawable.invisible)
-        if (character.paralyzed) icons.add(R.drawable.paralyzed)
-        if (character.petrified) icons.add(R.drawable.petrified)
-        if (character.prone) icons.add(R.drawable.prone)
-        if (character.quickened) icons.add(R.drawable.quickened)
-        if (character.restrained) icons.add(R.drawable.restrained)
-        if (character.sickened > 0) icons.add(R.drawable.sickened)
-        if (character.slowed > 0) icons.add(R.drawable.slowed)
-        if (character.stunned > 0) icons.add(R.drawable.stunned)
-        if (character.stupefied > 0) icons.add(R.drawable.stupefied)
-        if (character.unconscious) icons.add(R.drawable.unconscious)
-        if (character.wounded > 0) icons.add(R.drawable.wounded)
-        if (character.persistentDamage.isNotEmpty()) icons.add(R.drawable.persistent_damage)
+        if (character.blinded) conditions.add(bool(R.drawable.blinded))
+        if (character.concealed) conditions.add(bool(R.drawable.concealed))
+        if (character.confused) conditions.add(bool(R.drawable.confused))
+        if (character.controlled) conditions.add(bool(R.drawable.controlled))
+        if (character.dazzled) conditions.add(bool(R.drawable.dazzled))
+        if (character.deafened) conditions.add(bool(R.drawable.deafened))
+        if (character.encumbered) conditions.add(bool(R.drawable.encumbered))
+        if (character.fascinated) conditions.add(bool(R.drawable.fascinated))
+        if (character.fatigued) conditions.add(bool(R.drawable.fatigued))
+        if (character.flatFooted) conditions.add(bool(R.drawable.flat_footed))
+        if (character.fleeing) conditions.add(bool(R.drawable.fleeing))
+        if (character.grabbed) conditions.add(bool(R.drawable.grabbed))
+        if (character.immobilized) conditions.add(bool(R.drawable.immobilized))
+        if (character.invisible) conditions.add(bool(R.drawable.invisible))
+        if (character.paralyzed) conditions.add(bool(R.drawable.paralyzed))
+        if (character.petrified) conditions.add(bool(R.drawable.petrified))
+        if (character.prone) conditions.add(bool(R.drawable.prone))
+        if (character.quickened) conditions.add(bool(R.drawable.quickened))
+        if (character.restrained) conditions.add(bool(R.drawable.restrained))
+        if (character.unconscious) conditions.add(bool(R.drawable.unconscious))
+        addInt(conditions, R.drawable.clumsy, character.clumsy)
+        addInt(conditions, R.drawable.doomed, character.doomed)
+        addInt(conditions, R.drawable.drained, character.drained)
+        addInt(conditions, R.drawable.dying, character.dying)
+        addInt(conditions, R.drawable.enfeebled, character.enfeebled)
+        addInt(conditions, R.drawable.frightened, character.frightened)
+        addInt(conditions, R.drawable.sickened, character.sickened)
+        addInt(conditions, R.drawable.slowed, character.slowed)
+        addInt(conditions, R.drawable.stunned, character.stunned)
+        addInt(conditions, R.drawable.stupefied, character.stupefied)
+        addInt(conditions, R.drawable.wounded, character.wounded)
 
-        return icons
+        if (character.persistentDamage.isNotEmpty()) {
+            conditions.add(bool(R.drawable.persistent_damage))
+        }
+
+        return conditions
+    }
+
+    private fun bool(icon: Int): ConditionUi =
+        ConditionUi(icon, 0)
+
+    private fun addInt(
+        list: MutableList<ConditionUi>,
+        icon: Int,
+        value: Int
+    ) {
+        if (value > 0) {
+            Log.i("helper", value.toString())
+            list.add(ConditionUi(icon, value.coerceIn(1, 4)))
+        }
     }
 }

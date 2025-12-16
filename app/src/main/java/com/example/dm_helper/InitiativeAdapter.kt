@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -45,14 +46,11 @@ class InitiativeAdapter(
         holder.hpValue.text = "${currentCharacter.currentHP}/${currentCharacter.maximumHP}"
 
         holder.conditionIconsLayout.removeAllViews()
-        val conditionIcons = ConditionHelper.getConditionIcons(currentCharacter)
-        for (condition in conditionIcons) {
-            val imageView = ImageView(holder.itemView.context)
-            imageView.setImageResource(condition)
-            val layoutParams = LinearLayout.LayoutParams(48, 48)
-            layoutParams.marginEnd = 8
-            imageView.layoutParams = layoutParams
-            holder.conditionIconsLayout.addView(imageView)
+        val conditions = ConditionHelper.getConditions(currentCharacter)
+        for (condition in conditions) {
+            holder.conditionIconsLayout.addView(
+                createConditionView(holder.itemView, condition)
+            )
         }
 
         holder.dragHandle.setOnTouchListener { _, event ->
@@ -87,5 +85,46 @@ class InitiativeAdapter(
         characters.clear()
         characters.addAll(newCharacters)
         notifyDataSetChanged()
+    }
+
+    private fun createConditionView(
+        parent: View,
+        condition: ConditionUi
+    ): FrameLayout {
+
+        val context = parent.context
+
+        val container = FrameLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(48, 48).apply {
+                marginEnd = 8
+            }
+        }
+
+        val icon = ImageView(context).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            setImageResource(condition.iconRes)
+        }
+
+        container.addView(icon)
+
+        if (condition.value > 0) {
+            val badge = TextView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(20, 20).apply {
+                    gravity = android.view.Gravity.BOTTOM or android.view.Gravity.END
+                }
+                background = context.getDrawable(R.drawable.condition_badge)
+                text = condition.value.toString()
+                setTextColor(android.graphics.Color.WHITE)
+                textSize = 10f
+                gravity = android.view.Gravity.CENTER
+                setTypeface(null, android.graphics.Typeface.BOLD)
+            }
+            container.addView(badge)
+        }
+
+        return container
     }
 }
