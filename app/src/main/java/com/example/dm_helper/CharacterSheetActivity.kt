@@ -37,7 +37,7 @@ class CharacterSheetActivity : AppCompatActivity() {
     private fun populateCharacterSheet(character: Character) {
         findViewById<TextView>(R.id.character_name_sheet).text = character.name
         // Portrait would be loaded here with Glide/Coil if imageUrl is present
-        // findViewById<ImageView>(R.id.character_portrait_sheet).setImageResource(character.portrait)
+        findViewById<ImageView>(R.id.character_portrait_sheet).setImageResource(character.portrait)
 
         findViewById<TextView>(R.id.hp_sheet).text = "HP: ${character.currentHP}/${character.maximumHP}"
         findViewById<TextView>(R.id.ac_sheet).text = "AC: ${character.ac}"

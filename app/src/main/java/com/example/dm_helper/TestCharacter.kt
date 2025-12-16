@@ -4,7 +4,7 @@ fun createTestCharacter(): Character {
     return Character(
         name = "Test Goblin",
         initiative = 15,
-        portrait = R.drawable.ic_launcher_background, // placeholder
+        portrait = R.drawable.goblin, // placeholder
         imageUrl = null,
         conditions = listOf(),
         currentHP = 15,

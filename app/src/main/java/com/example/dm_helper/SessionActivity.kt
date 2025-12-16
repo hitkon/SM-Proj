@@ -39,7 +39,9 @@ class SessionActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         })
 
-        val adapter = InitiativeAdapter(mutableListOf(), itemTouchHelper)
+        val adapter = InitiativeAdapter(mutableListOf(), itemTouchHelper) { character ->
+            deleteCharacter(character)
+        }
         initiativeRecyclerView.adapter = adapter
         itemTouchHelper.attachToRecyclerView(initiativeRecyclerView)
 
@@ -54,6 +56,12 @@ class SessionActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 characterDao.insert(createTestCharacter())
             }
+        }
+    }
+
+    private fun deleteCharacter(character: Character) {
+        lifecycleScope.launch {
+            characterDao.delete(character)
         }
     }
 }

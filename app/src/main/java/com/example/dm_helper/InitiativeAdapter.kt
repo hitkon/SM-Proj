@@ -16,7 +16,8 @@ import java.util.Collections
 
 class InitiativeAdapter(
     private val characters: MutableList<Character>,
-    private val itemTouchHelper: ItemTouchHelper
+    private val itemTouchHelper: ItemTouchHelper,
+    private val onDeleteCharacter: (Character) -> Unit
 ) : RecyclerView.Adapter<InitiativeAdapter.InitiativeViewHolder>() {
 
     class InitiativeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -27,6 +28,7 @@ class InitiativeAdapter(
         val hpValue: TextView = itemView.findViewById(R.id.hp_value)
         val dragHandle: ImageView = itemView.findViewById(R.id.drag_handle)
         val characterSheetButton: ImageButton = itemView.findViewById(R.id.character_sheet_button)
+        val removeCharacterButton: ImageButton = itemView.findViewById(R.id.remove_character_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InitiativeViewHolder {
@@ -66,6 +68,10 @@ class InitiativeAdapter(
                 putExtra(CharacterSheetActivity.CHARACTER_ID, currentCharacter.id)
             }
             context.startActivity(intent)
+        }
+
+        holder.removeCharacterButton.setOnClickListener {
+            onDeleteCharacter(currentCharacter)
         }
     }
 
