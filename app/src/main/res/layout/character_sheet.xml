@@ -41,12 +41,50 @@
             app:layout_constraintStart_toStartOf="@id/character_name_sheet"
             app:layout_constraintTop_toBottomOf="@id/character_name_sheet">
 
-            <TextView
-                android:id="@+id/hp_sheet"
+            <LinearLayout
+                android:id="@+id/hp_controls"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="HP: 100/100" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/hp_sheet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HP: 100/100"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
+
+                    <Button
+                        android:id="@+id/hp_minus_button"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:text="−"
+                        android:textSize="12sp"
+                        android:padding="0sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="@android:color/holo_red_dark" />
+
+                    <Button
+                        android:id="@+id/hp_plus_button"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="8dp"
+                        android:text="+"
+                        android:textSize="12sp"
+                        android:padding="0sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="@android:color/holo_green_dark" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/ac_sheet"
@@ -68,7 +106,7 @@
             android:id="@+id/ability_scores_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="48dp"
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/character_portrait_sheet">
 

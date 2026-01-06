@@ -6,6 +6,9 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.FlexboxLayout
@@ -41,7 +44,31 @@ class CharacterSheetActivity : AppCompatActivity() {
         // Portrait would be loaded here with Glide/Coil if imageUrl is present
         findViewById<ImageView>(R.id.character_portrait_sheet).setImageResource(character.portrait)
 
-        findViewById<TextView>(R.id.hp_sheet).text = "HP: ${character.currentHP}/${character.maximumHP}"
+        val hpText = findViewById<TextView>(R.id.hp_sheet)
+        val minusButton = findViewById<Button>(R.id.hp_minus_button)
+        val plusButton = findViewById<Button>(R.id.hp_plus_button)
+
+        hpText.text = "HP: ${character.currentHP}/${character.maximumHP}"
+
+        minusButton.setOnClickListener {
+            lifecycleScope.launch {
+                val newHp = (character.currentHP - 1).coerceAtLeast(0)
+                characterDao.updateCurrentHp(character.id, newHp)
+            }
+        }
+
+        plusButton.setOnClickListener {
+            lifecycleScope.launch {
+                val newHp = (character.currentHP + 1).coerceAtMost(character.maximumHP)
+                characterDao.updateCurrentHp(character.id, newHp)
+            }
+        }
+
+        hpText.setOnLongClickListener {
+            showEditHpDialog(character)
+            true
+        }
+
         findViewById<TextView>(R.id.ac_sheet).text = "AC: ${character.ac}"
         findViewById<TextView>(R.id.speed_sheet).text = "Speed: ${character.speed}"
 
@@ -88,17 +115,43 @@ class CharacterSheetActivity : AppCompatActivity() {
         conditionsFlexbox.removeAllViews()
         val conditions = ConditionHelper.getConditions(character)
         for (condition in conditions) {
-            conditionsFlexbox.addView(createConditionView(condition))
+            conditionsFlexbox.addView(createConditionView(condition, character))
         }
     }
 
+    private fun showEditHpDialog(character: Character) {
+        val input = EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setText(character.currentHP.toString())
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Edit HP")
+            .setMessage("Set current HP (0-${character.maximumHP})")
+            .setView(input)
+            .setPositiveButton("OK") { _, _ ->
+                val value = input.text.toString().toIntOrNull() ?: return@setPositiveButton
+                lifecycleScope.launch {
+                    characterDao.updateCurrentHp(
+                        character.id,
+                        value.coerceIn(0, character.maximumHP)
+                    )
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun createConditionView(condition: ConditionUi): FrameLayout {
+    private fun createConditionView(condition: ConditionUi, character: Character): FrameLayout {
         val size = 96
 
         val container = FrameLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(size, size).apply {
                 marginEnd = 16
+            }
+            setOnClickListener {
+                onConditionTapped(condition, character)
             }
         }
 
@@ -128,5 +181,118 @@ class CharacterSheetActivity : AppCompatActivity() {
         }
 
         return container
+    }
+
+    private fun onConditionTapped(condition: ConditionUi, character: Character) {
+        lifecycleScope.launch {
+            when (condition.type) {
+
+                ConditionValueType.INT -> {
+                    val newValue = (condition.value - 1).coerceAtLeast(0)
+                    when (condition.field) {
+                        ConditionField.CLUMSY ->
+                            characterDao.updateClumsy(character.id, newValue)
+
+                        ConditionField.DOOMED ->
+                            characterDao.updateDoomed(character.id, newValue)
+
+                        ConditionField.DRAINED ->
+                            characterDao.updateDrained(character.id, newValue)
+
+                        ConditionField.DYING ->
+                            characterDao.updateDying(character.id, newValue)
+
+                        ConditionField.ENFEEBLED ->
+                            characterDao.updateEnfeebled(character.id, newValue)
+
+                        ConditionField.FRIGHTENED ->
+                            characterDao.updateFrightened(character.id, newValue)
+
+                        ConditionField.SICKENED ->
+                            characterDao.updateSickened(character.id, newValue)
+
+                        ConditionField.SLOWED ->
+                            characterDao.updateSlowed(character.id, newValue)
+
+                        ConditionField.STUNNED ->
+                            characterDao.updateStunned(character.id, newValue)
+
+                        ConditionField.STUPEFIED ->
+                            characterDao.updateStupefied(character.id, newValue)
+
+                        ConditionField.WOUNDED ->
+                            characterDao.updateWounded(character.id, newValue)
+
+                        else -> { }
+                    }
+                }
+
+                ConditionValueType.BOOLEAN ->  {
+                    when (condition.field) {
+                        ConditionField.BLINDED ->
+                            characterDao.updateBlinded(character.id, false)
+
+                        ConditionField.CONCEALED ->
+                            characterDao.updateConcealed(character.id, false)
+
+                        ConditionField.CONFUSED ->
+                            characterDao.updateConfused(character.id, false)
+
+                        ConditionField.CONTROLLED ->
+                            characterDao.updateControlled(character.id, false)
+
+                        ConditionField.DAZZLED ->
+                            characterDao.updateDazzled(character.id, false)
+
+                        ConditionField.DEAFENED ->
+                            characterDao.updateDeafened(character.id, false)
+
+                        ConditionField.ENCUMBERED ->
+                            characterDao.updateEncumbered(character.id, false)
+
+                        ConditionField.FASCINATED ->
+                            characterDao.updateFascinated(character.id, false)
+
+                        ConditionField.FATIGUED ->
+                            characterDao.updateFatigued(character.id, false)
+
+                        ConditionField.FLAT_FOOTED ->
+                            characterDao.updateFlatFooted(character.id, false)
+
+                        ConditionField.FLEEING ->
+                            characterDao.updateFleeing(character.id, false)
+
+                        ConditionField.GRABBED ->
+                            characterDao.updateGrabbed(character.id, false)
+
+                        ConditionField.IMMOBILIZED ->
+                            characterDao.updateImmobilized(character.id, false)
+
+                        ConditionField.INVISIBLE ->
+                            characterDao.updateInvisible(character.id, false)
+
+                        ConditionField.PARALYZED ->
+                            characterDao.updateParalyzed(character.id, false)
+
+                        ConditionField.PETRIFIED ->
+                            characterDao.updatePetrified(character.id, false)
+
+                        ConditionField.PRONE ->
+                            characterDao.updateProne(character.id, false)
+
+                        ConditionField.QUICKENED ->
+                            characterDao.updateQuickened(character.id, false)
+
+                        ConditionField.RESTRAINED ->
+                            characterDao.updateRestrained(character.id, false)
+
+                        ConditionField.UNCONSCIOUS ->
+                            characterDao.updateUnconscious(character.id, false)
+
+                        else -> { }
+                    }
+                }
+            }
+        }
     }
 }
