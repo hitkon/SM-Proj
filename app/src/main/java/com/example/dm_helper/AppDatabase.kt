@@ -6,10 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [Character::class], version = 1)
+@Database(entities = [Character::class, CharacterBlueprint::class], version = 2) // Incremented version number
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun characterDao(): CharacterDao
+    abstract fun characterBlueprintDao(): CharacterBlueprintDao
 
     companion object {
         @Volatile
@@ -21,7 +22,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "dm_helper_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration() // Add this to handle the schema change
+                .build()
                 INSTANCE = instance
                 instance
             }
