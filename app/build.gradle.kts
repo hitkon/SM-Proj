@@ -40,6 +40,12 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    
+    packagingOptions {
+        resources.excludes.add("META-INF/LICENSE")
+        resources.excludes.add("META-INF/NOTICE")
+        resources.excludes.add("META-INF/DEPENDENCIES")
+    }
 }
 
 dependencies {
@@ -67,4 +73,5 @@ dependencies {
     implementation("androidx.room:room-paging:$room_version")
     testImplementation("androidx.room:room-testing:$room_version")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.itextpdf:itextg:5.5.10")
 }

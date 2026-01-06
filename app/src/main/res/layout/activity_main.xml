@@ -24,8 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:id="@+id/btnUploadPortrait"
-        android:text="Upload Portrait" />
+        android:id="@+id/btnUploadCharacterPdf"
+        android:text="Upload Character from PDF" />
 
     <Button
         android:layout_width="match_parent"
@@ -33,5 +33,19 @@
         android:layout_marginTop="16dp"
         android:id="@+id/btnShowPortraits"
         android:text="Show Uploaded Portraits" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:id="@+id/btnParseTestPdf"
+        android:text="Parse Test PDF" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:id="@+id/btnCharacterLibrary"
+        android:text="Character Library" />
 
 </LinearLayout>

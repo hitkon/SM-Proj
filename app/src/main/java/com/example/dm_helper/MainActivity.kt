@@ -1,56 +1,58 @@
 package com.example.dm_helper
 
+import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import android.widget.Button
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.dm_helper.data.Portrait
-import com.example.dm_helper.data.PortraitDatabase
-import com.example.dm_helper.databinding.ActivityMainBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private val db by lazy { PortraitDatabase.getDatabase(this) }
+    private lateinit var characterBlueprintDao: CharacterBlueprintDao
+    private lateinit var pdfParser: PdfCharacterParser
 
-    private val pickImageLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            savePortraitToDatabase(uri.toString())
+    private val openPdfLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            it.data?.data?.let { uri ->
+                lifecycleScope.launch {
+                    val blueprint = pdfParser.parseCharacterBlueprint(uri)
+                    blueprint?.let { characterBlueprintDao.insert(it) }
+                }
+            }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_main)
 
-        binding.btnNewGame.setOnClickListener {
-            val intent = Intent(this, SessionActivity::class.java)
-            startActivity(intent)
+        characterBlueprintDao = AppDatabase.getDatabase(this).characterBlueprintDao()
+        pdfParser = PdfCharacterParser(this)
+
+        findViewById<Button>(R.id.btnNewGame).setOnClickListener {
+            startActivity(Intent(this, SessionActivity::class.java))
         }
 
-        binding.btnLoadGame.setOnClickListener {  }
-
-        binding.btnUploadPortrait.setOnClickListener {
-            pickImageLauncher.launch("image/*")
+        findViewById<Button>(R.id.btnUploadCharacterPdf).setOnClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/pdf"
+            }
+            openPdfLauncher.launch(intent)
         }
 
-        binding.btnShowPortraits.setOnClickListener {
-            startActivity(Intent(this, PortraitGalleryActivity::class.java))
+        findViewById<Button>(R.id.btnParseTestPdf).setOnClickListener {
+            lifecycleScope.launch {
+                val blueprint = pdfParser.parseCharacterBlueprintFromRaw(R.raw.argono)
+                blueprint?.let { characterBlueprintDao.insert(it) }
+            }
         }
-    }
 
-    private fun savePortraitToDatabase(uri: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            db.portraitDao().insert(Portrait(imageUri = uri))
+        findViewById<Button>(R.id.btnCharacterLibrary).setOnClickListener {
+            startActivity(Intent(this, CharacterLibraryActivity::class.java))
         }
     }
 }
