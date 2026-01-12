@@ -51,22 +51,11 @@ class CharacterSheetActivity : AppCompatActivity() {
         hpText.text = "HP: ${character.currentHP}/${character.maximumHP}"
 
         minusButton.setOnClickListener {
-            lifecycleScope.launch {
-                val newHp = (character.currentHP - 1).coerceAtLeast(0)
-                characterDao.updateCurrentHp(character.id, newHp)
-            }
+            showEditHpDialog(character, isIncrease = false)
         }
 
         plusButton.setOnClickListener {
-            lifecycleScope.launch {
-                val newHp = (character.currentHP + 1).coerceAtMost(character.maximumHP)
-                characterDao.updateCurrentHp(character.id, newHp)
-            }
-        }
-
-        hpText.setOnLongClickListener {
-            showEditHpDialog(character)
-            true
+            showEditHpDialog(character, isIncrease = true)
         }
 
         findViewById<TextView>(R.id.ac_sheet).text = "AC: ${character.ac}"
@@ -119,23 +108,28 @@ class CharacterSheetActivity : AppCompatActivity() {
         }
     }
 
-    private fun showEditHpDialog(character: Character) {
+    private fun showEditHpDialog(character: Character, isIncrease: Boolean) {
         val input = EditText(this).apply {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            setText(character.currentHP.toString())
+            hint = "Amount"
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Edit HP")
-            .setMessage("Set current HP (0-${character.maximumHP})")
+            .setTitle(if (isIncrease) "Increase HP" else "Decrease HP")
+            .setMessage("Enter amount")
             .setView(input)
             .setPositiveButton("OK") { _, _ ->
                 val value = input.text.toString().toIntOrNull() ?: return@setPositiveButton
                 lifecycleScope.launch {
-                    characterDao.updateCurrentHp(
-                        character.id,
-                        value.coerceIn(0, character.maximumHP)
-                    )
+                    val newHp = if (isIncrease) {
+                        (character.currentHP + value)
+                            .coerceAtMost(character.maximumHP)
+                    } else {
+                        (character.currentHP - value)
+                            .coerceAtLeast(0)
+                    }
+
+                    characterDao.updateCurrentHp(character.id, newHp)
                 }
             }
             .setNegativeButton("Cancel", null)
