@@ -82,7 +82,7 @@ object ConditionHelper {
         if (character.persistentDamage.isNotEmpty()) {
             conditions.add(
                 bool(
-                    ConditionField.DYING,
+                    ConditionField.PERSISTENT_DAMAGE,
                     R.drawable.persistent_damage
                 )
             )
@@ -94,8 +94,7 @@ object ConditionHelper {
     private fun bool(
         field: ConditionField,
         icon: Int
-    ): ConditionUi =
-        ConditionUi(
+    ): ConditionUi =        ConditionUi(
             field = field,
             type = ConditionValueType.BOOLEAN,
             iconRes = icon

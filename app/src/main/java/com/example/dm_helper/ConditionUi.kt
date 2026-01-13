@@ -21,7 +21,6 @@ enum class ConditionField {
     QUICKENED,
     RESTRAINED,
     UNCONSCIOUS,
-
     CLUMSY,
     DOOMED,
     DRAINED,
@@ -32,13 +31,15 @@ enum class ConditionField {
     SLOWED,
     STUNNED,
     STUPEFIED,
-    WOUNDED
+    WOUNDED,
+    PERSISTENT_DAMAGE
 }
 
 enum class ConditionValueType {
     BOOLEAN,
     INT
 }
+
 data class ConditionUi(
     val field: ConditionField,
     val type: ConditionValueType,

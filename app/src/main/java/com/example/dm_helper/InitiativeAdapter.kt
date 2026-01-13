@@ -6,13 +6,14 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import java.util.Collections
 
 class InitiativeAdapter(
@@ -23,13 +24,14 @@ class InitiativeAdapter(
 
     class InitiativeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val characterPortrait: ImageView = itemView.findViewById(R.id.character_portrait)
-        val characterName: TextView = itemView.findViewById(R.id.character_name)
-        val initiativeValue: TextView = itemView.findViewById(R.id.initiative_value)
-        val conditionIconsLayout: LinearLayout = itemView.findViewById(R.id.condition_icons_layout)
         val hpValue: TextView = itemView.findViewById(R.id.hp_value)
+        val removeCharacterButton: ImageButton = itemView.findViewById(R.id.remove_character_button)
+        val uploadImageButton: ImageButton = itemView.findViewById(R.id.upload_image_button)
+        val characterName: TextView = itemView.findViewById(R.id.character_name)
+        val conditionIconsLayout: LinearLayout = itemView.findViewById(R.id.condition_icons_layout)
+        val initiativeValue: TextView = itemView.findViewById(R.id.initiative_value)
         val dragHandle: ImageView = itemView.findViewById(R.id.drag_handle)
         val characterSheetButton: ImageButton = itemView.findViewById(R.id.character_sheet_button)
-        val removeCharacterButton: ImageButton = itemView.findViewById(R.id.remove_character_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InitiativeViewHolder {
@@ -40,17 +42,31 @@ class InitiativeAdapter(
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: InitiativeViewHolder, position: Int) {
         val currentCharacter = characters[position]
-        holder.characterPortrait.setImageResource(currentCharacter.portrait)
+
+        if (!currentCharacter.imageUrl.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .load(currentCharacter.imageUrl.toUri())
+                .into(holder.characterPortrait)
+        } else {
+            holder.characterPortrait.setImageResource(currentCharacter.portrait)
+        }
+
         holder.characterName.text = currentCharacter.name
         holder.initiativeValue.text = currentCharacter.initiative.toString()
         holder.hpValue.text = "${currentCharacter.currentHP}/${currentCharacter.maximumHP}"
 
+        // Hide the upload button in the session view
+        holder.uploadImageButton.visibility = View.GONE
+
         holder.conditionIconsLayout.removeAllViews()
-        val conditions = ConditionHelper.getConditions(currentCharacter)
-        for (condition in conditions) {
-            holder.conditionIconsLayout.addView(
-                createConditionView(holder.itemView, condition)
-            )
+        val conditionIcons = ConditionHelper.getConditions(currentCharacter)
+        for (condition in conditionIcons) {
+            val imageView = ImageView(holder.itemView.context)
+            imageView.setImageResource(condition.iconRes)
+            val layoutParams = LinearLayout.LayoutParams(48, 48)
+            layoutParams.marginEnd = 8
+            imageView.layoutParams = layoutParams
+            holder.conditionIconsLayout.addView(imageView)
         }
 
         holder.dragHandle.setOnTouchListener { _, event ->
@@ -85,46 +101,5 @@ class InitiativeAdapter(
         characters.clear()
         characters.addAll(newCharacters)
         notifyDataSetChanged()
-    }
-
-    private fun createConditionView(
-        parent: View,
-        condition: ConditionUi
-    ): FrameLayout {
-
-        val context = parent.context
-
-        val container = FrameLayout(context).apply {
-            layoutParams = LinearLayout.LayoutParams(48, 48).apply {
-                marginEnd = 8
-            }
-        }
-
-        val icon = ImageView(context).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            setImageResource(condition.iconRes)
-        }
-
-        container.addView(icon)
-
-        if (condition.value > 0) {
-            val badge = TextView(context).apply {
-                layoutParams = FrameLayout.LayoutParams(20, 20).apply {
-                    gravity = android.view.Gravity.BOTTOM or android.view.Gravity.END
-                }
-                background = context.getDrawable(R.drawable.condition_badge)
-                text = condition.value.toString()
-                setTextColor(android.graphics.Color.WHITE)
-                textSize = 10f
-                gravity = android.view.Gravity.CENTER
-                setTypeface(null, android.graphics.Typeface.BOLD)
-            }
-            container.addView(badge)
-        }
-
-        return container
     }
 }

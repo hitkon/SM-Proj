@@ -26,9 +26,8 @@ class CharacterBlueprintSheetActivity : AppCompatActivity() {
         val blueprintId = intent.getIntExtra(BLUEPRINT_ID, -1)
         if (blueprintId != -1) {
             lifecycleScope.launch {
-                characterBlueprintDao.getBlueprintById(blueprintId).collect { blueprint ->
-                    blueprint?.let { populateCharacterSheet(it) }
-                }
+                val blueprint = characterBlueprintDao.getBlueprintById(blueprintId)
+                blueprint?.let { populateCharacterSheet(it) }
             }
         }
     }

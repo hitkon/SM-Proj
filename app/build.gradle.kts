@@ -74,4 +74,7 @@ dependencies {
     testImplementation("androidx.room:room-testing:$room_version")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.itextpdf:itextg:5.5.10")
+
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    ksp("com.github.bumptech.glide:compiler:4.12.0")
 }

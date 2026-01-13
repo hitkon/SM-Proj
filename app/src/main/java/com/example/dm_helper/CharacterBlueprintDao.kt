@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -18,8 +19,11 @@ interface CharacterBlueprintDao {
     fun getAllBlueprints(): Flow<List<CharacterBlueprint>>
 
     @Query("SELECT * FROM character_blueprints WHERE id = :id")
-    fun getBlueprintById(id: Int): Flow<CharacterBlueprint?>
+    suspend fun getBlueprintById(id: Int): CharacterBlueprint?
 
     @Delete
     suspend fun delete(characterBlueprint: CharacterBlueprint)
+
+    @Update
+    suspend fun update(characterBlueprint: CharacterBlueprint)
 }

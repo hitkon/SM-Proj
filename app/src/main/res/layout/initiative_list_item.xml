@@ -33,10 +33,18 @@
             android:textColor="@android:color/white" />
 
         <ImageButton
-            android:id="@+id/remove_character_button"
+            android:id="@+id/upload_image_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="top|start"
+            android:background="@android:drawable/ic_menu_camera"
+            android:contentDescription="Upload Image" />
+
+        <ImageButton
+            android:id="@+id/remove_character_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
             android:background="@android:drawable/ic_menu_close_clear_cancel"
             android:contentDescription="Remove Character" />
 

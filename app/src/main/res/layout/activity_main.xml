@@ -5,47 +5,41 @@
     android:gravity="center"
     android:padding="24dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/app_background">
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/btnNewGame"
+        android:layout_width="246dp"
+        android:layout_height="wrap_content"
         android:text="New Game" />
 
     <Button
-        android:layout_width="match_parent"
+        android:id="@+id/btnLoadGame"
+        android:layout_width="239dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:id="@+id/btnLoadGame"
         android:text="Load Game" />
 
     <Button
-        android:layout_width="match_parent"
+        android:id="@+id/btnUploadCharacterPdf"
+        android:layout_width="241dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:id="@+id/btnUploadCharacterPdf"
         android:text="Upload Character from PDF" />
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:id="@+id/btnShowPortraits"
-        android:text="Show Uploaded Portraits" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:id="@+id/btnParseTestPdf"
+        android:layout_width="244dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Parse Test PDF" />
 
     <Button
-        android:layout_width="match_parent"
+        android:id="@+id/btnCharacterLibrary"
+        android:layout_width="239dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:id="@+id/btnCharacterLibrary"
         android:text="Character Library" />
 
 </LinearLayout>

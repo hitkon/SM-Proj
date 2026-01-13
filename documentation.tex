@@ -1,0 +1,138 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+
+% Geometry setup
+\geometry{margin=1in}
+
+% Color definitions for code listings
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Listing style
+\lstdefinestyle{kotlinstyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=kotlinstyle}
+
+\title{\textbf{DM Helper Application Documentation}}
+\author{Development Team}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    The \textbf{DM Helper} is an Android application developed to assist Dungeon Masters in managing tabletop role-playing game sessions. This document outlines the system architecture, key features, and implementation details of the application, including its database schema, PDF parsing capabilities, and condition tracking mechanisms.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+The DM Helper application serves as a digital assistant for tracking game states in tabletop RPGs. It replaces traditional pen-and-paper tracking for dynamic elements such as initiative order, character health points (HP), and temporary status effects (conditions). The application also streamlines character creation by importing data directly from PDF character sheets.
+
+\section{System Architecture}
+
+\subsection{Technology Stack}
+The application is built using the modern Android development ecosystem:
+\begin{itemize}
+    \item \textbf{Language:} Kotlin
+    \item \textbf{Minimum SDK:} API 33 (Android 13)
+    \item \textbf{Target SDK:} API 36
+    \item \textbf{Database:} Room (SQLite abstraction layer)
+    \item \textbf{Asynchronous Programming:} Kotlin Coroutines & Flow
+    \item \textbf{PDF Processing:} iTextG library
+    \item \textbf{UI Layouts:} XML with FlexboxLayout for dynamic content
+\end{itemize}
+
+\subsection{Database Schema}
+The application uses a local SQLite database accessed via the Room persistence library. The primary database, \texttt{AppDatabase}, manages two main entities:
+\begin{enumerate}
+    \item \textbf{CharacterBlueprint}: Represents the immutable template of a character (base stats, max HP, skills).
+    \item \textbf{Character}: Represents an active instance of a character in a session, containing mutable state (current HP, active conditions).
+\end{enumerate}
+
+\section{Key Modules and Features}
+
+\subsection{Session Management}
+The \texttt{SessionActivity} is the central hub for gameplay. It features:
+\begin{itemize}
+    \item \textbf{Initiative Tracking:} A \texttt{RecyclerView} displays characters in initiative order.
+    \item \textbf{Drag-and-Drop Reordering:} Implemented using \texttt{ItemTouchHelper}, allowing the DM to manually adjust turn order.
+    \item \textbf{Dynamic Updates:} Uses Kotlin Flows to observe database changes and update the UI in real-time.
+\end{itemize}
+
+\subsection{Character Sheet View}
+The \texttt{CharacterSheetActivity} provides a comprehensive view of a specific character. It displays:
+\begin{itemize}
+    \item \textbf{Vital Statistics:} HP (with quick edit buttons), AC, Speed.
+    \item \textbf{Ability Scores:} Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, along with calculated modifiers.
+    \item \textbf{Saving Throws:} Fortitude, Reflex, Will.
+    \item \textbf{Skills:} A complete list of skills (Acrobatics, Arcana, etc.).
+    \item \textbf{Conditions:} A dynamic grid of active status effects.
+\end{itemize}
+
+\subsection{PDF Character Import}
+One of the application's core features is the \texttt{PdfCharacterParser}. This module allows users to import character data from standard PDF sheets.
+
+\subsubsection{Parsing Logic}
+The parser extracts raw text from PDF pages using \texttt{PdfTextExtractor}. It then employs Regular Expressions (Regex) to identify and extract specific data points:
+\begin{itemize}
+    \item \textbf{Name Extraction:} Looks for text patterns following "Player Name".
+    \item \textbf{Ability Scores:} Identifies the "Strength Dexterity..." header line and parses the subsequent numerical values.
+    \item \textbf{Flexible Stat Extraction:} A helper function searches for stat names (e.g., "Acrobatics") and captures the associated signed integer.
+\end{itemize}
+
+\begin{lstlisting}[language=Kotlin, caption=Example Regex Extraction Logic]
+private fun extractStat(text: String, regex: String): String? {
+    val pattern = Regex(regex, setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL))
+    val match = pattern.find(text)
+    return match?.groups?.get(1)?.value?.trim()
+}
+\end{lstlisting}
+
+\subsection{Condition Tracking}
+The \texttt{ConditionHelper} object manages the logic for RPG conditions (e.g., Blinded, Stunned).
+\begin{itemize}
+    \item \textbf{Visual Representation:} Each condition is associated with a specific icon resource.
+    \item \textbf{Value Types:} Conditions are categorized as Boolean (on/off) or Integer (valued, e.g., Stunned 2).
+    \item \textbf{Interactive UI:} Tapping a condition icon in the Character Sheet decrements its value or toggles it off, updating the database immediately.
+\end{itemize}
+
+\section{Implementation Details}
+
+\subsection{Coroutines and Threading}
+All database operations (Insert, Update, Delete) are performed off the main thread using \texttt{lifecycleScope.launch}. This ensures the UI remains responsive even during complex queries or PDF parsing operations.
+
+\subsection{Resource Management}
+Condition images are stored in the \texttt{res/drawable} directory. The \texttt{ConditionUi} data class dynamically maps database fields to these resources, allowing the \texttt{FlexboxLayout} to render only the active conditions for any given character.
+
+\section{Conclusion}
+The DM Helper application provides a robust foundation for digital tabletop management. By combining efficient local data storage with intelligent PDF parsing and a reactive UI, it significantly reduces the administrative burden on Dungeon Masters. Future work could include expanding the PDF parser to support more template formats and adding network capabilities for multi-device sessions.
+
+\end{document}
