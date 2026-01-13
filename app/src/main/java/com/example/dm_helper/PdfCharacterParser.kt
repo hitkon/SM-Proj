@@ -50,8 +50,15 @@ class PdfCharacterParser(private val context: Context) {
             Log.d("PdfParser", text)
             Log.d("PdfParser", "--- End of Full PDF Text ---")
 
-            // Look for the name on the line after "Player Name"
-            val name = extractStat(text, """Player Name\s*\n([^\n]+)""") ?: "Unknown"
+            // Parse character name with multiple fallbacks for different layouts
+            var name = extractStat(text, """\nXP\s*\n([^\n]+)""")?.trim() ?: "Unknown"
+            // Check for junk lines like "x" or "x x"
+            if (name.matches(Regex("""^x(\s*x)?$"""))) {
+                name = extractStat(text, """\nXP\s*\n[^\n]+\n([^\n]+)""")?.trim() ?: name
+            }
+            if (name == "Unknown" || name.matches(Regex("""^x(\s*x)?$"""))) {
+                name = extractStat(text, """Player Name\s*\n([^\n]+)""") ?: "Unknown"
+            }
             Log.d("PdfParser", "Name: $name")
 
             val lines = text.lines()

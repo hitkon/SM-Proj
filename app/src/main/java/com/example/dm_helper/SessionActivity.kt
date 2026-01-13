@@ -17,6 +17,7 @@ class SessionActivity : AppCompatActivity() {
 
     private lateinit var characterDao: CharacterDao
     private lateinit var characterBlueprintDao: CharacterBlueprintDao
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     private val getBlueprintLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
@@ -41,21 +42,39 @@ class SessionActivity : AppCompatActivity() {
         characterBlueprintDao = AppDatabase.getDatabase(this).characterBlueprintDao()
 
         val initiativeRecyclerView: RecyclerView = findViewById(R.id.initiative_recycler_view)
+
         val adapter = InitiativeAdapter(
             mutableListOf(),
-            ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-                override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                    (recyclerView.adapter as InitiativeAdapter).moveItem(viewHolder.adapterPosition, target.adapterPosition)
-                    return true
-                }
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-            }),
             onDeleteCharacter = { character ->
                 lifecycleScope.launch { characterDao.delete(character) }
+            },
+            onStartDrag = { viewHolder ->
+                itemTouchHelper.startDrag(viewHolder)
             }
         )
         initiativeRecyclerView.adapter = adapter
         initiativeRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        val callback = object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                (recyclerView.adapter as InitiativeAdapter).moveItem(
+                    viewHolder.adapterPosition,
+                    target.adapterPosition
+                )
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+        }
+
+        itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(initiativeRecyclerView)
 
         lifecycleScope.launch {
             characterDao.getAllCharacters().collect {

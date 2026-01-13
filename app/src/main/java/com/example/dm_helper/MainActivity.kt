@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -19,7 +20,12 @@ class MainActivity : AppCompatActivity() {
             it.data?.data?.let { uri ->
                 lifecycleScope.launch {
                     val blueprint = pdfParser.parseCharacterBlueprint(uri)
-                    blueprint?.let { characterBlueprintDao.insert(it) }
+                    if (blueprint != null) {
+                        characterBlueprintDao.insert(blueprint)
+                        Toast.makeText(this@MainActivity, "Character uploaded to the library successfully", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Failed to parse character from PDF", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -47,7 +53,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnParseTestPdf).setOnClickListener {
             lifecycleScope.launch {
                 val blueprint = pdfParser.parseCharacterBlueprintFromRaw(R.raw.argono)
-                blueprint?.let { characterBlueprintDao.insert(it) }
+                if (blueprint != null) {
+                    characterBlueprintDao.insert(blueprint)
+                    Toast.makeText(this@MainActivity, "Test character added to the library successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to parse test character PDF", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 

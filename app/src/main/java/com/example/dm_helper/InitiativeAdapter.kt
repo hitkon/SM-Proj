@@ -18,8 +18,8 @@ import java.util.Collections
 
 class InitiativeAdapter(
     private val characters: MutableList<Character>,
-    private val itemTouchHelper: ItemTouchHelper,
-    private val onDeleteCharacter: (Character) -> Unit
+    private val onDeleteCharacter: (Character) -> Unit,
+    private val onStartDrag: (RecyclerView.ViewHolder) -> Unit
 ) : RecyclerView.Adapter<InitiativeAdapter.InitiativeViewHolder>() {
 
     class InitiativeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -55,7 +55,6 @@ class InitiativeAdapter(
         holder.initiativeValue.text = currentCharacter.initiative.toString()
         holder.hpValue.text = "${currentCharacter.currentHP}/${currentCharacter.maximumHP}"
 
-        // Hide the upload button in the session view
         holder.uploadImageButton.visibility = View.GONE
 
         holder.conditionIconsLayout.removeAllViews()
@@ -71,7 +70,7 @@ class InitiativeAdapter(
 
         holder.dragHandle.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                itemTouchHelper.startDrag(holder)
+                onStartDrag(holder)
             }
             true
         }
